@@ -1,0 +1,11 @@
+# Server
+flask
+
+# Analytical
+numpy
+pandas
+geopandas
+linref
+
+# Testing
+geodatasets
