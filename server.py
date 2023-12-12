@@ -1,7 +1,14 @@
-from flask import Flask, send_from_directory
-import random
+# Server features
+from flask import Flask, request, send_from_directory, Response, jsonify
+from logging import FileHandler, WARNING
+
+# Utilities
+import random, json
+
+# Data IO
 import ops
 from ops.load_data import _load_from_path, _load_sample_data
+from ops.globals import _loaded_data
 
 
 #
@@ -9,6 +16,8 @@ from ops.load_data import _load_from_path, _load_sample_data
 #
 
 app = Flask(__name__)
+file_handler = FileHandler('errorlog.txt')
+file_handler.setLevel(WARNING)
 
 
 #
@@ -43,12 +52,44 @@ def load_from_path(path):
 def load_sample_data(label):
     return _load_sample_data(label).to_json()
 
+@app.route("/data/push/<path:name>", methods=['POST'])
+def data_push(name):
+    # Retrieve data from POST
+    data = json.loads(request.json)
+    # Log to loaded data variable
+    _loaded_data[name] = data
+    # Update console
+    print(f"Loaded data: {name}")
+    return {}, 200
+
+@app.route("/data/pull/<path:name>", methods=['POST'])
+def data_pull(name):
+    # Grab data from memory
+    try:
+        response = _loaded_data[name].to_json()
+        status = 200
+    except KeyError:
+        response = {
+            'message': 'data unavailable from memory',
+            'name': name,
+        }
+        status = 404
+    # Prepare data
+    return response, status
 
 #
 # VISUALIZATION ENDPOINTS
 #
 
 app.route("/viz/map")
+
+
+#
+# TESTING FEATURES
+#
+
+_loaded_data['us-states.json'] = _load_from_path(r"C:\Users\tariq\Downloads\us-states.json")
+print(_loaded_data)
 
 
 #
