@@ -1,5 +1,6 @@
 # Server
 flask
+gunicorn==21.2.0
 
 # Database
 sqlalchemy
