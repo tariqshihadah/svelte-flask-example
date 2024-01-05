@@ -10,6 +10,9 @@ import ops
 from ops.load_data import _load_from_path, _load_sample_data
 from ops.globals import _loaded_data
 
+# Database
+from database import db
+
 
 #
 # DEFINE APPLICATION
@@ -19,6 +22,14 @@ app = Flask(__name__)
 file_handler = FileHandler('errorlog.txt')
 file_handler.setLevel(WARNING)
 
+
+#
+# INITIALIZE DATABASE
+#
+
+# Configure the SQLite database
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
+db.init_app(app)
 
 #
 # WEB PAGE ROUTES
